@@ -32,3 +32,5 @@ Route.get('/health', async ({response}) => {
 })
 
 Route.post('/contacts', 'ContactsController.store')
+
+Route.put('/contacts/:id', 'ContactsController.update').middleware(['findContact'])
