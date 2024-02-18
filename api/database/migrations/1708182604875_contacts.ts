@@ -10,6 +10,7 @@ export default class extends BaseSchema {
       table.string('id').primary().unique().notNullable().index()
       table.string('first_name').notNullable().index()
       table.string('surname').notNullable().index()
+      table.string('company')
       table.string('job_title')
       table.string('email1').index()
       table.string('email2').index()
