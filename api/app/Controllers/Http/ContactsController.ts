@@ -5,6 +5,23 @@ import Logger from '@ioc:Adonis/Core/Logger'
 
 export default class ContactsController {
 
+    public async list ({request, response}: HttpContextContract) {
+        try {
+            const {page, perPage} = request.qs()
+
+            const contacts = await Contact.query().select(['id', 'first_name', 'surname', 'phone_number1', 'company', 'job_title']).paginate(page, perPage)
+    
+            return response.ok({data: contacts})
+            
+        } catch (error) {
+            Logger.error('Error at ContactsController.list:\n%o', error)
+            return response.status(error?.status ?? 500).json({
+                message: 'An error occurred while fetching contacts.',
+                error: process.env.NODE_ENV !== 'production' ? error : null
+            })
+        }
+    }
+
     public async store ({request, response}: HttpContextContract) {
         try {
             // const payload = request.body()   // before validation
