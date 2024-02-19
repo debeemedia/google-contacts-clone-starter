@@ -2,6 +2,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Contact from 'App/Models/Contact'
 import ContactValidator from 'App/Validators/ContactValidator'
 import Logger from '@ioc:Adonis/Core/Logger'
+import { Attachment } from '@ioc:Adonis/Addons/AttachmentLite'
 
 export default class ContactsController {
 
@@ -9,7 +10,7 @@ export default class ContactsController {
         try {
             const {page, perPage} = request.qs()
 
-            const contacts = await Contact.query().select(['id', 'first_name', 'surname', 'phone_number1', 'company', 'job_title']).paginate(page, perPage)
+            const contacts = await Contact.query().select(['id', 'first_name', 'surname', 'phone_number1', 'company', 'job_title', 'profile_picture']).paginate(page, perPage)
     
             return response.ok({data: contacts})
             
@@ -42,7 +43,8 @@ export default class ContactsController {
                 state,
                 birthday,
                 website,
-                notes
+                notes,
+                profilePicture
             } = payload
     
             const contact = await Contact.create({
@@ -61,7 +63,8 @@ export default class ContactsController {
                 state,
                 birthday,
                 website,
-                notes
+                notes,
+                profilePicture: profilePicture ? Attachment.fromFile(profilePicture) : null
             })
     
             await contact.refresh()
@@ -107,7 +110,8 @@ export default class ContactsController {
                 state,
                 birthday,
                 website,
-                notes
+                notes,
+                profilePicture
             } = payload
     
             requestedContact?.merge({
@@ -126,7 +130,8 @@ export default class ContactsController {
                 state,
                 birthday,
                 website,
-                notes
+                notes,
+                profilePicture: profilePicture ? Attachment.fromFile(profilePicture) : null
             })
     
             await requestedContact?.save()
