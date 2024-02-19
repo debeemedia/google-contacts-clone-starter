@@ -59,6 +59,18 @@ export default class ContactsController {
         }
     }
 
+    public async show ({request, response, requestedContact}: HttpContextContract) {
+        try {
+            return response.ok({data: requestedContact})
+        } catch (error) {
+            Logger.error('Error at ContactsController.show: \n%o', error)
+            return response.status(error?.status ?? 500).json({
+                message: 'An error occurred while fetching the contact.',
+                error: process.env.NODE_ENV !== 'production' ? error : null
+            })
+        }
+    }
+
     public async update ({request, response, requestedContact}: HttpContextContract) {
         try {
             const payload = await request.validate(ContactValidator)
@@ -103,14 +115,32 @@ export default class ContactsController {
             await requestedContact?.save()
             await requestedContact?.refresh()
 
-            return response.created({message: 'Contact was edited', data: requestedContact})
+            return response.ok({message: 'Contact was edited', data: requestedContact})
             
         } catch (error) {
             Logger.error('Error at ContactsController.update: \n%o', error)
             return response.status(error?.status ?? 500).json({
-                message: 'An error occurred while updatin the contact.',
+                message: 'An error occurred while updating the contact.',
                 error: process.env.NODE_ENV !== 'production' ? error : null
             })
         }
     }
+
+    public async destroy ({request, response, requestedContact}: HttpContextContract) {
+        try {
+            await requestedContact?.delete()
+            
+            return response.ok({message: 'Contact was deleted', data: requestedContact?.id})
+
+        } catch (error) {
+            Logger.error('Error at ContactsController.destroy: \n%o', error)
+            return response.status(error?.status ?? 500).json({
+                message: 'An error occurred while deleting the contact.',
+                error: process.env.NODE_ENV !== 'production' ? error : null
+            })
+        }
+        }
+    }
+
+    
 }
