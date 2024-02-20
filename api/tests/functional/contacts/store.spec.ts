@@ -29,12 +29,95 @@ test.group('Contacts store', (group) => {
     
     
     response.assertStatus(201)
-  
+    response.assertBodyContains({email1: 'testing1.deborah.okeke@gotedo.com'})
+
     const contact = await Contact.query().where('email1', 'testing1.deborah.okeke@gotedo.com').firstOrFail()
     assert.exists(contact)
-    assert.equal(contact.firstName, 'Deborah')
-    assert.equal(contact.surname, 'Okeke')
+    assert.equal(contact.firstName, response.body().firstName)
+    assert.equal(contact.surname, response.body().surname)
     
+  })
+  // .pin()
+
+  test('fail to create contact without required fields', async ({client, assert}) => {
+    const response = await client.post('/contacts')
+    .form({company: 'Gotedo'})
+
+    // response.dumpBody()
+    // console.log(response.response.text);
+
+    response.assertStatus(422)
+
+    response.assertBodyContains({
+      message: 'An error occurred while creating the contact.',
+      error: { flashToSession: false, messages: { errors: [
+        {
+          "rule":"required",
+          "field":"firstName",
+          "message":"First Name is required"
+        },
+        {
+          "rule":"required",
+          "field":"surname",
+          "message":"Surname is required"
+        },
+        {
+          "rule":"required",
+          "field":"email1",
+          "message":
+          "Email1 is required"
+        },
+        {
+          "rule":"required",
+          "field":"phoneNumber1",
+          "message":"Phone Number1 is required"
+        }] }}
+    })
+  })
+  // .pin()
+
+  test('fail to create contact with incorrect birthday date format', async ({client, assert}) => {
+
+    const response = await client.post('/contacts')
+    .form({birthday: '22-06-1997'})
+
+    response.dumpBody()
+    console.log(response.response.text);
+
+    
+    response.assertStatus(422)
+    response.assertBodyContains({
+      message: 'An error occurred while creating the contact.',
+      error: { flashToSession: false, messages: { errors: [{
+        "rule":"date.format",
+        "field":"birthday",
+        "message":"Please provide a valid birthday",
+        "args":{"format":"yyyy-MM-dd"}
+      }] } }
+    })
+
+  })
+  // .pin()
+
+  test('fail to create contact with invalid birthday', async ({client, assert}) => {
+
+    const response = await client.post('/contacts')
+    .form({birthday: '2024-06-22'})
+
+    // response.dumpBody()
+    // console.log(response.response.text);
+
+    
+    response.assertStatus(422)
+    response.assertBodyContains({
+      message: 'An error occurred while creating the contact.',
+      error: { flashToSession: false, messages: { errors: [{
+        "rule":"before",
+        "field":"birthday",
+        "message":"Birthday must be before 'today'"
+      }] } }
+    })
+
   })
   // .pin()
 })

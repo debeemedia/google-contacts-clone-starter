@@ -26,11 +26,22 @@ test.group('Contacts update', (group) => {
       jobTitle: 'Backend Intern'
     })
     const responseBodyData = JSON.parse(response.response.text).data
+    // response.dumpBody()
   
     const fetchedContact = await Contact.findOrFail(createdContact.id)
-    // console.log('fetchedContact-----', fetchedContact);
+    // console.log('fetchedContact-----', fetchedContact);    
   
     response.assertStatus(200)
+    response.assertBodyContains({
+      message: 'Contact was edited',
+      data: {
+        firstName: 'Deborah',
+        surname: 'Okeke',
+        email1: 'testing1.deborah.okeke@gotedo.com',
+        phoneNumber1: '08109210257',
+        jobTitle: 'Backend Intern'
+      }
+    })
     assert.notEqual(null, responseBodyData.jobTitle)
     assert.equal(fetchedContact.jobTitle, responseBodyData.jobTitle)
   

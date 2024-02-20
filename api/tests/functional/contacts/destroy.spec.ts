@@ -24,7 +24,12 @@ test.group('Contacts destroy', (group) => {
     // test to delete the created contact
     const response = await client.delete(`/contacts/${createdContactId}`)
   
+    // response.dumpBody()
     response.assertStatus(200)
+    response.assertBodyContains({
+      message: 'Contact was deleted',
+      data: createdContactId
+    })
   
     const deletedContact = await Contact.find(createdContactId)
   

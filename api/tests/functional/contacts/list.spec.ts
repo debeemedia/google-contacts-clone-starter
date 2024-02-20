@@ -1,6 +1,5 @@
 import Database from '@ioc:Adonis/Lucid/Database'
 import { test } from '@japa/runner'
-import Contact from 'App/Models/Contact'
 import { ContactFactory } from 'Database/factories'
 
 test.group('Contacts list', (group) => {

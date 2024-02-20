@@ -49,10 +49,24 @@ test('fail to upload image greater than 500kb', async ({client, assert}) => {
       jobTitle: 'Backend Intern',
       company: 'Gotedo'
   })
-  // .file('profilePicture', contents, {filename: name})
+  // .file('profilePicture', contents, {filename: name})  // trying to generate dummy file
   .file('profilePicture', Application.makePath('passport_debee.jpg'))
 
+  // response.dumpBody()
+  // console.log(response.response.text);
+
   response.assertStatus(422)
+
+  response.assertBodyContains({
+    message: 'An error occurred while creating the contact.',
+    error: { flashToSession: false, messages: { errors: [{
+      "rule":"file.size",
+      "field":"profilePicture",
+      "message":"File size should be less than 500KB",
+      "args":{"size":"500kb",
+      "extnames":["jpg","png","webp","gif"]
+    }}] }}
+  })
 })
 // .pin()
 
@@ -68,13 +82,18 @@ test('fail to upload unsupported file format', async ({client, assert}) => {
   })
   .file('profilePicture', Application.makePath('bear-image.jfif'))
 
-  response.assertStatus(422)
+  // response.dumpBody()
+  // console.log(response.response.text);
 
-  // response.assertBodyContains({
-  //   message: 'An error occurred while creating the contact.',
-  //   error: {flashToSession: false, messages: {}}
-  // })
-  
+  response.assertStatus(422)
+  response.assertBodyContains({
+    message: 'An error occurred while creating the contact.',
+    error: { flashToSession: false, messages: { errors: [{
+      "rule": "file.extname",
+      "field": "profilePicture",
+      "message": "Invalid file extension jfif. Only jpg, png, webp, gif are allowed",
+      "args": {"size":"500kb", "extnames": ["jpg","png","webp","gif"]}}] }}
+  })
 })
 // .pin()
 })
