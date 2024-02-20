@@ -10,7 +10,7 @@ test.group('Contacts store', (group) => {
     return () => Database.rollbackGlobalTransaction()
   })
 
-  test('should create a new contact', async ({assert, client}) => {
+  test('create a new contact', async ({assert, client}) => {
 
     const payload = {
       firstName: 'Deborah',
@@ -39,7 +39,7 @@ test.group('Contacts store', (group) => {
   })
   // .pin()
 
-  test('should fail to create contact without required fields', async ({client, assert}) => {
+  test('fail to create contact without required fields', async ({client, assert}) => {
     const response = await client.post('/contacts')
     .form({company: 'Gotedo'})
 
@@ -76,7 +76,7 @@ test.group('Contacts store', (group) => {
   })
   // .pin()
 
-  test('should should fail to create contact with incorrect birthday date format', async ({client, assert}) => {
+  test('fail to create contact with incorrect birthday date format', async ({client, assert}) => {
 
     const response = await client.post('/contacts')
     .form({birthday: '22-06-1997'})
@@ -99,7 +99,7 @@ test.group('Contacts store', (group) => {
   })
   // .pin()
 
-  test('should fail to create contact with invalid birthday', async ({client, assert}) => {
+  test('fail to create contact with invalid birthday', async ({client, assert}) => {
 
     const response = await client.post('/contacts')
     .form({birthday: '2024-06-22'})

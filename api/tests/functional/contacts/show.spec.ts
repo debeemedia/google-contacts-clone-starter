@@ -10,7 +10,7 @@ test.group('Contacts show', (group) => {
     return () => Database.rollbackGlobalTransaction()
   })
 
-  test('should fetch a contact', async ({client, assert}) => {
+  test('fetch a contact', async ({client, assert}) => {
 
     // create the contact first
     const createdContact = await client.post('/contacts').form({

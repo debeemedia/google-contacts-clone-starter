@@ -14,7 +14,7 @@ test.group('Contacts image upload', (group) => {
   })
 
   
-test('should upload an image while creating a contact', async ({assert, client}) => {
+test('upload an image while creating a contact', async ({assert, client}) => {
 
   const response = await client.post('/contacts')
   .fields({
@@ -39,7 +39,7 @@ test('should upload an image while creating a contact', async ({assert, client})
 })
 // .pin()
 
-test('should fail to upload image greater than 500kb', async ({client, assert}) => {
+test('fail to upload image greater than 500kb', async ({client, assert}) => {
   const response = await client.post('/contacts')
   .fields({
     firstName: 'Deborah',
@@ -62,7 +62,7 @@ test('should fail to upload image greater than 500kb', async ({client, assert}) 
     error: { flashToSession: false, messages: { errors: [{
       "rule":"file.size",
       "field":"profilePicture",
-      "message":"File size should be less than 500KB",
+      "message":"File size be less than 500KB",
       "args":{"size":"500kb",
       "extnames":["jpg","png","webp","gif"]
     }}] }}
@@ -70,7 +70,7 @@ test('should fail to upload image greater than 500kb', async ({client, assert}) 
 })
 // .pin()
 
-test('should fail to upload unsupported file format', async ({client, assert}) => {
+test('fail to upload unsupported file format', async ({client, assert}) => {
   const response = await client.post('/contacts')
   .fields({
     firstName: 'Deborah',

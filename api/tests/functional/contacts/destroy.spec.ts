@@ -9,7 +9,7 @@ test.group('Contacts destroy', (group) => {
     return () => Database.rollbackGlobalTransaction()
   })
 
-  test('should delete a contact', async ({client, assert}) => {
+  test('delete a contact', async ({client, assert}) => {
 
     // create the contact first
     const contact = await client.post('/contacts').form({
