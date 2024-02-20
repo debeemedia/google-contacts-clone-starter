@@ -62,7 +62,7 @@ test('fail to upload image greater than 500kb', async ({client, assert}) => {
     error: { flashToSession: false, messages: { errors: [{
       "rule":"file.size",
       "field":"profilePicture",
-      "message":"File size be less than 500KB",
+      "message":"File size should be less than 500KB",
       "args":{"size":"500kb",
       "extnames":["jpg","png","webp","gif"]
     }}] }}
