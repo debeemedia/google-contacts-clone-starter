@@ -9,7 +9,7 @@ test.group('Contacts update', (group) => {
     return () => Database.rollbackGlobalTransaction()
   })
 
-  test('update an existing contact', async ({client, assert}) => {
+  test('should update an existing contact', async ({client, assert}) => {
   
     // create the contact first
     const contact = await client.post('/contacts').form({

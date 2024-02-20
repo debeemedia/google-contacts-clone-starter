@@ -14,7 +14,7 @@ test.group('Contacts image upload', (group) => {
   })
 
   
-test('upload an image while creating a contact', async ({assert, client}) => {
+test('should upload an image while creating a contact', async ({assert, client}) => {
 
   const response = await client.post('/contacts')
   .fields({
@@ -39,7 +39,7 @@ test('upload an image while creating a contact', async ({assert, client}) => {
 })
 // .pin()
 
-test('fail to upload image greater than 500kb', async ({client, assert}) => {
+test('should fail to upload image greater than 500kb', async ({client, assert}) => {
   const response = await client.post('/contacts')
   .fields({
     firstName: 'Deborah',
@@ -70,7 +70,7 @@ test('fail to upload image greater than 500kb', async ({client, assert}) => {
 })
 // .pin()
 
-test('fail to upload unsupported file format', async ({client, assert}) => {
+test('should fail to upload unsupported file format', async ({client, assert}) => {
   const response = await client.post('/contacts')
   .fields({
     firstName: 'Deborah',

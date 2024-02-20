@@ -9,7 +9,7 @@ test.group('Contacts list', (group) => {
     return () => Database.rollbackGlobalTransaction()
   })
 
-  test('fetch paginated list of contacts', async ({client, assert}) => {
+  test('should fetch paginated list of contacts', async ({client, assert}) => {
 
     // seed the database first
     await ContactFactory.createMany(10)

@@ -10,7 +10,7 @@ test.group('Middleware find contact', (group) => {
     return () => Database.rollbackGlobalTransaction()
   })
 
-  test('fail to find a contact that does not exist', async ({assert, client}) => {
+  test('should fail to find a contact that does not exist', async ({assert, client}) => {
     const id = cuid()
     const response = await client.get(`contacts/${id}`)
     // response.dumpBody()
