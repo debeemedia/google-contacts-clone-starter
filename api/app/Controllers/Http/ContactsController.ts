@@ -6,7 +6,7 @@ import { Attachment } from '@ioc:Adonis/Addons/AttachmentLite'
 
 export default class ContactsController {
 
-    public async list ({request, response}: HttpContextContract) {
+    public async index ({request, response}: HttpContextContract) {
         try {
             const {page, perPage} = request.qs()
 
@@ -15,7 +15,7 @@ export default class ContactsController {
             return response.ok({data: contacts})
             
         } catch (error) {
-            Logger.error('Error at ContactsController.list:\n%o', error)
+            Logger.error('Error at ContactsController.index:\n%o', error)
             return response.status(error?.status ?? 500).json({
                 message: 'An error occurred while fetching contacts.',
                 error: process.env.NODE_ENV !== 'production' ? error : null

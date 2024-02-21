@@ -13,7 +13,6 @@ test.group('Middleware find contact', (group) => {
   test('fail to find a contact that does not exist', async ({assert, client}) => {
     const id = cuid()
     const response = await client.get(`contacts/${id}`)
-    // response.dumpBody()
 
     response.assertStatus(404)
     response.assertBodyContains({message: 'Unknown contact was requested'})

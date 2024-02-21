@@ -31,12 +31,15 @@ Route.get('/health', async ({response}) => {
   return report.healthy ? response.ok(report) : response.badRequest(report)
 })
 
-Route.get('/contacts', 'ContactsController.list')
+// Route.get('/contacts', 'ContactsController.index')
+// Route.post('/contacts', 'ContactsController.store')
+// Route.put('/contacts/:id', 'ContactsController.update').middleware(['findContact'])
+// Route.get('/contacts/:id', 'ContactsController.show').middleware(['findContact'])
+// Route.delete('/contacts/:id', 'ContactsController.destroy').middleware(['findContact'])
 
-Route.post('/contacts', 'ContactsController.store')
-
-Route.put('/contacts/:id', 'ContactsController.update').middleware(['findContact'])
-
-Route.get('/contacts/:id', 'ContactsController.show').middleware(['findContact'])
-
-Route.delete('/contacts/:id', 'ContactsController.destroy').middleware(['findContact'])
+// refactored routes
+Route.resource('contacts', 'ContactsController').apiOnly().middleware({
+  show: ['findContact'],
+  update: ['findContact'],
+  destroy: ['findContact']
+})

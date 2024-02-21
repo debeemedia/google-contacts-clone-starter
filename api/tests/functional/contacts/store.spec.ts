@@ -1,7 +1,7 @@
 import Database from '@ioc:Adonis/Lucid/Database'
 import { test } from '@japa/runner'
 import Contact from 'App/Models/Contact'
-import ContactValidator from 'App/Validators/ContactValidator'
+
 
 test.group('Contacts store', (group) => {
   // Write your test here
@@ -10,80 +10,68 @@ test.group('Contacts store', (group) => {
     return () => Database.rollbackGlobalTransaction()
   })
 
-  test('create a new contact', async ({assert, client}) => {
+  test('create a new contact', async ({route, assert, client}) => {
+
+    const email1 = 'testing3.deborah.okeke@gotedo.com'
 
     const payload = {
       firstName: 'Deborah',
       surname: 'Okeke',
-      email1: 'testing1.deborah.okeke@gotedo.com',
-      phoneNumber1: '08109210257',
-      jobTitle: 'Backend Intern',
-      company: 'Gotedo'
+      email1,
+      phoneNumber1: '08109210257'
     }  
       
-    const response = await client.post('/contacts')
+    const response = await client.post(route('ContactsController.store'))
     .form(payload)
-  
-    // console.log('the response---', response);
-    // response.dumpBody()
-    
-    
+    const responseBody = response.body()
+         
     response.assertStatus(201)
-    response.assertBodyContains({email1: 'testing1.deborah.okeke@gotedo.com'})
+    response.assertBodyContains({email1})
 
-    const contact = await Contact.query().where('email1', 'testing1.deborah.okeke@gotedo.com').firstOrFail()
+    const contact = await Contact.query().where('email1', email1).firstOrFail()
     assert.exists(contact)
-    assert.equal(contact.firstName, response.body().firstName)
-    assert.equal(contact.surname, response.body().surname)
+    assert.equal(contact.firstName, responseBody.firstName)
+    assert.equal(contact.surname, responseBody.surname)
     
   })
   // .pin()
 
-  test('fail to create contact without required fields', async ({client, assert}) => {
-    const response = await client.post('/contacts')
-    .form({company: 'Gotedo'})
+  test('fail to create contact without required fields', async ({route, client, assert}) => {
 
-    // response.dumpBody()
-    // console.log(response.response.text);
+    const requiredFields = ['firstName', 'surname', 'email1', 'phoneNumber1']
+    const formData = {}
+    requiredFields.forEach(requiredField => {
+      formData[requiredField] = ''
+    })
+
+    const response = await client.post(route('ContactsController.store'))
+    .form(formData)
 
     response.assertStatus(422)
 
+    const errorMessages = requiredFields.map(requiredField => {
+      return {
+        rule: 'required',
+        field: requiredField,
+        message: `${requiredField.charAt(0).toUpperCase() + requiredField.slice(1)} is required`
+
+      }      
+    })    
+
     response.assertBodyContains({
       message: 'An error occurred while creating the contact.',
-      error: { flashToSession: false, messages: { errors: [
-        {
-          "rule":"required",
-          "field":"firstName",
-          "message":"First Name is required"
-        },
-        {
-          "rule":"required",
-          "field":"surname",
-          "message":"Surname is required"
-        },
-        {
-          "rule":"required",
-          "field":"email1",
-          "message":
-          "Email1 is required"
-        },
-        {
-          "rule":"required",
-          "field":"phoneNumber1",
-          "message":"Phone Number1 is required"
-        }] }}
+      error: { flashToSession: false, messages: { errors: errorMessages }}
     })
   })
   // .pin()
 
-  test('fail to create contact with incorrect birthday date format', async ({client, assert}) => {
+  test('fail to create contact with incorrect birthday date format', async ({route, client, assert}) => {
 
-    const response = await client.post('/contacts')
+    const response = await client.post(route('ContactsController.store'))
     .form({birthday: '22-06-1997'})
 
     response.dumpBody()
     console.log(response.response.text);
-
     
     response.assertStatus(422)
     response.assertBodyContains({
@@ -99,15 +87,17 @@ test.group('Contacts store', (group) => {
   })
   // .pin()
 
-  test('fail to create contact with invalid birthday', async ({client, assert}) => {
+  test('fail to create contact with birthday that is after today', async ({route, client, assert}) => {
 
-    const response = await client.post('/contacts')
-    .form({birthday: '2024-06-22'})
+    const today = new Date()
+    let futureDate = new Date()
+    futureDate.setDate(today.getDate() + 1)
+    const formattedFutureDate =  futureDate.toISOString().split('T')[0];
+    // console.log(formattedFutureDate);
 
-    // response.dumpBody()
-    // console.log(response.response.text);
+    const response = await client.post(route('ContactsController.store'))
+    .form({birthday: formattedFutureDate})
 
-    
     response.assertStatus(422)
     response.assertBodyContains({
       message: 'An error occurred while creating the contact.',

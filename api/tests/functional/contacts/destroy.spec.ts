@@ -1,6 +1,7 @@
 import Database from '@ioc:Adonis/Lucid/Database'
 import { test } from '@japa/runner'
 import Contact from 'App/Models/Contact'
+import { ContactFactory } from 'Database/factories'
 
 test.group('Contacts destroy', (group) => {
   // Write your test here
@@ -9,31 +10,23 @@ test.group('Contacts destroy', (group) => {
     return () => Database.rollbackGlobalTransaction()
   })
 
-  test('delete a contact', async ({client, assert}) => {
+  test('delete a contact', async ({client, assert, route}) => {
 
     // create the contact first
-    const contact = await client.post('/contacts').form({
-      firstName: 'Deborah',
-      surname: 'Okeke',
-      email1: 'testing1.deborah.okeke@gotedo.com',
-      phoneNumber1: '08109210257'
-    })
-  
-    const createdContactId = JSON.parse(contact.response.text).id
+    const contact = await ContactFactory.create()
   
     // test to delete the created contact
-    const response = await client.delete(`/contacts/${createdContactId}`)
+    const response = await client.delete(route('ContactsController.destroy', {id: contact.id}))
   
     // response.dumpBody()
     response.assertStatus(200)
     response.assertBodyContains({
       message: 'Contact was deleted',
-      data: createdContactId
+      data: contact.id
     })
   
-    const deletedContact = await Contact.find(createdContactId)
+    const deletedContact = await Contact.find(contact.id)
   
-    assert.notExists(deletedContact)
     assert.isNull(deletedContact)
   
   })

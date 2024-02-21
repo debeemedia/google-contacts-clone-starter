@@ -2,6 +2,7 @@ import Database from '@ioc:Adonis/Lucid/Database'
 import { test } from '@japa/runner'
 import ContactsController from 'App/Controllers/Http/ContactsController'
 import Contact from 'App/Models/Contact'
+import { ContactFactory } from 'Database/factories'
 
 test.group('Contacts show', (group) => {
   // Write your test here
@@ -10,36 +11,24 @@ test.group('Contacts show', (group) => {
     return () => Database.rollbackGlobalTransaction()
   })
 
-  test('fetch a contact', async ({client, assert}) => {
+  test('fetch a contact', async ({client, assert, route}) => {
 
     // create the contact first
-    const createdContact = await client.post('/contacts').form({
-      firstName: 'Deborah',
-      surname: 'Okeke',
-      email1: 'testing1.deborah.okeke@gotedo.com',
-      phoneNumber1: '08109210257'
-    })
-    const createdContactId = JSON.parse(createdContact.response.text).id
-    // console.log('created contact id---', createdContactId);
-  
+    const contact = await ContactFactory.create()
   
     // test to fetch the created contact
-    const response = await client.get(`/contacts/${createdContactId}`)
-    // console.log(JSON.parse(response.response.text).data)
-    const fetchedContact = await Contact.findOrFail(createdContactId)
-
-    // response.dumpBody()
-    // console.log(response.body().data)
+    const response = await client.get(route('ContactsController.show', {id: contact.id}))
+    const fetchedContact = await Contact.findOrFail(contact.id)
     
     response.assertStatus(200)
 
     response.assertBodyContains({
       data: {
-        id: createdContactId,
-        firstName: 'Deborah',
-        surname: 'Okeke',
-        email1: 'testing1.deborah.okeke@gotedo.com',
-        phoneNumber1: '08109210257'
+        id: fetchedContact.id,
+        firstName: fetchedContact.firstName,
+        surname: fetchedContact.surname,
+        email1: fetchedContact.email1,
+        phoneNumber1: fetchedContact.phoneNumber1
       }
     })
   

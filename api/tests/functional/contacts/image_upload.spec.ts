@@ -1,9 +1,8 @@
-import Application from '@ioc:Adonis/Core/Application'
-// import {file} from '@ioc:Adonis/Core/Helpers'
-// const {contents, name} = file.generateJpg('2mb')
+// import Application from '@ioc:Adonis/Core/Application'
 import Database from '@ioc:Adonis/Lucid/Database'
 import { test } from '@japa/runner'
-import Contact from 'App/Models/Contact'
+import Drive from '@ioc:Adonis/Core/Drive'
+import { file } from '@ioc:Adonis/Core/Helpers'
 
 
 test.group('Contacts image upload', (group) => {
@@ -14,76 +13,89 @@ test.group('Contacts image upload', (group) => {
   })
 
   
-test('upload an image while creating a contact', async ({assert, client}) => {
+test('upload an image while creating a contact', async ({route, assert, client}) => {
 
-  const response = await client.post('/contacts')
+  const drive = Drive.fake()
+  const {contents, name} = await file.generatePng('200kb')
+
+  const email1 = 'testing4.deborah.okeke@gotedo.com'
+  const response = await client.post(route('ContactsController.store'))
   .fields({
     firstName: 'Deborah',
-      surname: 'Okeke',
-      email1: 'testing1.deborah.okeke@gotedo.com',
-      phoneNumber1: '08109210257',
-      jobTitle: 'Backend Intern',
-      company: 'Gotedo'
+    surname: 'Okeke',
+    email1,
+    phoneNumber1: '08109210257',
+    jobTitle: 'Backend Intern',
+    company: 'Gotedo'
   })
-  .file('profilePicture', Application.makePath('Bear-Avatar-icon.png'))
+  // .file('profilePicture', Application.makePath('Bear-Avatar-icon.png'))  // using real image
+  .file('profilePicture', contents, {filename: name})
 
-  
   response.assertStatus(201)
 
-  const contact = await Contact.query().where('email1', 'testing1.deborah.okeke@gotedo.com').firstOrFail()
-  // console.log(contact);
-  
-  assert.exists(contact)
-  assert.exists(contact.profilePicture)
+  response.assertBodyContains({
+    profilePicture: {
+      extname: 'png',
+      mimeType: 'image/png'
+    }
+  })
+
+  assert.isTrue(await drive.exists(name))
   
 })
 // .pin()
+// .tags(['image'])
 
-test('fail to upload image greater than 500kb', async ({client, assert}) => {
-  const response = await client.post('/contacts')
+test('fail to upload image greater than 500kb', async ({route, client, assert}) => {
+
+  const {contents, name} = await file.generateJpg('1mb')
+
+  const response = await client.post(route('ContactsController.store'))
   .fields({
     firstName: 'Deborah',
-      surname: 'Okeke',
-      email1: 'testing1.deborah.okeke@gotedo.com',
-      phoneNumber1: '08109210257',
-      jobTitle: 'Backend Intern',
-      company: 'Gotedo'
+    surname: 'Okeke',
+    email1: 'testing@gmail.com',
+    phoneNumber1: '08109210257'
   })
-  // .file('profilePicture', contents, {filename: name})  // trying to generate dummy file
-  .file('profilePicture', Application.makePath('passport_debee.jpg'))
-
-  // response.dumpBody()
-  // console.log(response.response.text);
+  .file('profilePicture', contents, {filename: name})
 
   response.assertStatus(422)
-
+  
   response.assertBodyContains({
-    message: 'An error occurred while creating the contact.',
-    error: { flashToSession: false, messages: { errors: [{
-      "rule":"file.size",
-      "field":"profilePicture",
-      "message":"File size should be less than 500KB",
-      "args":{"size":"500kb",
-      "extnames":["jpg","png","webp","gif"]
-    }}] }}
+    "message":"An error occurred while creating the contact.",
+    "error":{
+      "flashToSession":false,
+      "messages":{
+        "errors":[{
+          "rule":"file.size",
+          "field":"profilePicture",
+          "message":"File size should be less than 500KB",
+          "args":{
+            "size":"500kb",
+            "extnames":["jpg","png","webp","gif"]
+          }
+        }]
+      }
+    }
   })
 })
 // .pin()
+// .tags(['image'])
 
-test('fail to upload unsupported file format', async ({client, assert}) => {
-  const response = await client.post('/contacts')
+test('fail to upload unsupported file format', async ({route, client, assert}) => {
+
+  const {contents, name} = await file.generateDocx('10kb')
+
+  const response = await client.post(route('ContactsController.store'))
   .fields({
     firstName: 'Deborah',
       surname: 'Okeke',
-      email1: 'testing1.deborah.okeke@gotedo.com',
+      email1: 'testing3.deborah.okeke@gotedo.com',
       phoneNumber1: '08109210257',
       jobTitle: 'Backend Intern',
       company: 'Gotedo'
   })
-  .file('profilePicture', Application.makePath('bear-image.jfif'))
-
-  // response.dumpBody()
-  // console.log(response.response.text);
+  .file('profilePicture', contents, {filename: name})
 
   response.assertStatus(422)
   response.assertBodyContains({
@@ -91,9 +103,11 @@ test('fail to upload unsupported file format', async ({client, assert}) => {
     error: { flashToSession: false, messages: { errors: [{
       "rule": "file.extname",
       "field": "profilePicture",
-      "message": "Invalid file extension jfif. Only jpg, png, webp, gif are allowed",
-      "args": {"size":"500kb", "extnames": ["jpg","png","webp","gif"]}}] }}
+      "message": "Invalid file extension docx. Only jpg, png, webp, gif are allowed",
+      "args": {"size":"500kb", "extnames": ["jpg","png","webp","gif"]}
+    }] }}
   })
 })
 // .pin()
+// .tags(['image'])
 })
