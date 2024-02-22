@@ -27,44 +27,10 @@ export default class ContactsController {
         try {
             // const payload = request.body()   // before validation
             const payload = await request.validate(ContactValidator)
-            const {
-                firstName,
-                surname,
-                jobTitle,
-                email1,
-                email2,
-                phoneNumber1,
-                phoneNumber2,
-                country,
-                streetAddressLine1,
-                streetAddressLine2,
-                city,
-                postCode,
-                state,
-                birthday,
-                website,
-                notes,
-                profilePicture
-            } = payload
     
             const contact = await Contact.create({
-                firstName,
-                surname,
-                jobTitle,
-                email1,
-                email2,
-                phoneNumber1,
-                phoneNumber2,
-                country,
-                streetAddressLine1,
-                streetAddressLine2,
-                city,
-                postCode,
-                state,
-                birthday,
-                website,
-                notes,
-                profilePicture: profilePicture ? Attachment.fromFile(profilePicture) : null
+                ...payload,
+                profilePicture: payload.profilePicture ? Attachment.fromFile(payload.profilePicture) : null
             })
     
             await contact.refresh()
@@ -94,44 +60,9 @@ export default class ContactsController {
     public async update ({request, response, requestedContact}: HttpContextContract) {
         try {
             const payload = await request.validate(ContactValidator)
-            const {
-                firstName,
-                surname,
-                jobTitle,
-                email1,
-                email2,
-                phoneNumber1,
-                phoneNumber2,
-                country,
-                streetAddressLine1,
-                streetAddressLine2,
-                city,
-                postCode,
-                state,
-                birthday,
-                website,
-                notes,
-                profilePicture
-            } = payload
     
             requestedContact?.merge({
-                firstName,
-                surname,
-                jobTitle,
-                email1,
-                email2,
-                phoneNumber1,
-                phoneNumber2,
-                country,
-                streetAddressLine1,
-                streetAddressLine2,
-                city,
-                postCode,
-                state,
-                birthday,
-                website,
-                notes,
-                profilePicture: profilePicture ? Attachment.fromFile(profilePicture) : null
+                profilePicture: payload.profilePicture ? Attachment.fromFile(payload.profilePicture) : null
             })
     
             await requestedContact?.save()

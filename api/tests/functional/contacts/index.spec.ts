@@ -1,5 +1,6 @@
 import Database from '@ioc:Adonis/Lucid/Database'
 import { test } from '@japa/runner'
+import Contact from 'App/Models/Contact'
 import { ContactFactory } from 'Database/factories'
 
 test.group('Contacts index', (group) => {
@@ -11,7 +12,10 @@ test.group('Contacts index', (group) => {
 
   test('fetch paginated list of contacts', async ({client, assert}) => {
 
-    // seed the database first
+    // clear the database
+    await Contact.query().delete()
+
+    // seed the database
     await ContactFactory.createMany(10)
   
     let page = 1
