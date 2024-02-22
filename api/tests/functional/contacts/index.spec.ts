@@ -27,7 +27,8 @@ test.group('Contacts index', (group) => {
     assert.equal(responseBody.data.data.length, perPage)
     assert.equal(responseBody.data.meta.current_page, page)
     assert.equal(responseBody.data.meta.per_page, perPage)
-    // assert.equal(responseBody.data.meta.total, 10) // can't work because i have more than 10 contacts in my database
+    
+    assert.equal(responseBody.data.meta.total, 10)
   
   })
   // .pin()
