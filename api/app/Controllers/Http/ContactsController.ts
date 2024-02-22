@@ -62,6 +62,7 @@ export default class ContactsController {
             const payload = await request.validate(ContactValidator)
     
             requestedContact?.merge({
+                ...payload,
                 profilePicture: payload.profilePicture ? Attachment.fromFile(payload.profilePicture) : null
             })
     
