@@ -33,7 +33,7 @@ export default class ContactsController {
                 profilePicture: payload.profilePicture ? Attachment.fromFile(payload.profilePicture) : null
             })
     
-            await contact.refresh()
+            // await contact.refresh()  // refresh unsupported in new versions
             return response.created(contact)
             
         } catch (error) {
@@ -66,7 +66,7 @@ export default class ContactsController {
             })
     
             await requestedContact?.save()
-            await requestedContact?.refresh()
+            // await requestedContact?.refresh()    // refresh unsupported in new versions
 
             return response.ok({message: 'Contact was edited', data: requestedContact})
             
